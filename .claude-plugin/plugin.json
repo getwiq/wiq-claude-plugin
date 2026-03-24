@@ -1,0 +1,8 @@
+{
+  "name": "wiq",
+  "description": "Expose WIQ process data as MCP tools for Claude-powered workflow automation",
+  "version": "0.1.0",
+  "author": {
+    "name": "WIQ"
+  }
+}
