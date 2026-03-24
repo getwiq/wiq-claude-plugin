@@ -6,6 +6,11 @@
     "name": "WIQ"
   },
   "category": "automation",
-  "homepage": "https://github.com/getwiq/wiq-claude-plugin",
-  "keywords": ["processes", "automation", "mcp", "workflow"]
+  "homepage": "https://getwiq.ai",
+  "keywords": [
+    "processes",
+    "automation",
+    "mcp",
+    "workflow"
+  ]
 }

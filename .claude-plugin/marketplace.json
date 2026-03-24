@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "wiq",
-      "source": "./",
+      "source": "./wiq",
       "version": "0.1.0",
       "description": "Expose WIQ process data as MCP tools for Claude-powered workflow automation",
       "category": "automation",
