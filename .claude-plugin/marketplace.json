@@ -9,16 +9,16 @@
   "plugins": [
     {
       "name": "wiq",
-      "source": {
-        "source": "github",
-        "repo": "getwiq/wiq-claude-plugin",
-        "ref": "main"
-
-      },
+      "source": "./",
       "version": "0.1.0",
       "description": "Expose WIQ process data as MCP tools for Claude-powered workflow automation",
       "category": "automation",
-      "keywords": ["processes", "automation", "mcp", "workflow"]
+      "keywords": [
+        "processes",
+        "automation",
+        "mcp",
+        "workflow"
+      ]
     }
   ]
 }
