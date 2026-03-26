@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "WIQ": {
-      "url": "https://mcp.staging.getwiq.ai/mcp",
+      "url": "https://mcp.prod.getwiq.ai/mcp",
       "clientId": "Pnuhvw5lii2ZlfFUYj5LyvCn3K9JQYse"
     }
   }
