@@ -1,9 +1,9 @@
 ---
 name: tool-validator
-description: Validate that Claude has the required MCP tools to automate a process from its blueprint
+description: Validate that Claude has the required MCP tools to automate a blueprint
 ---
 
-Given a **process ID** and one or more **blueprint IDs**:
+Given one or more **blueprint IDs**:
 Your task is to validate that all required MCP tools are available and correctly mapped for each blueprint, and update the blueprint if any mismatches are found.
 
 1. For each blueprint ID, use the `get_blueprint_details` MCP tool to fetch the full automation flow, escalation paths, and tools

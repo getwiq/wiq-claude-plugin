@@ -1,23 +1,22 @@
 ---
-description: Trial run of a WIQ process — executes one ticket at a time with user confirmation after every step
+description: Trial run of a WIQ blueprint — executes one ticket at a time with user confirmation after every step
 disable-model-invocation: false
 ---
 
 **This is a trial run.** You must ask the user for confirmation after every step before proceeding to the next. No parallel execution is allowed — tickets are always processed one at a time, sequentially.
 
-Automate the WIQ process "$ARGUMENTS" as a trial run.
+Automate the WIQ blueprint "$ARGUMENTS" as a trial run.
 
 ## Phase 1: Discovery and setup
 
-1. Use the `list_processes` MCP tool to find the process matching "$ARGUMENTS" and get its ID
-2. Use the `list_blueprints` tool with the process ID to get available blueprints and their ticket matching rules
-3. From the blueprints, identify:
+1. Use the `list_blueprints` MCP tool to find blueprints matching "$ARGUMENTS" and their ticket matching rules
+2. Select the correct blueprint based on what the user wants to automate, ask the user if ambiguous then use `get_blueprint_details` to fetch the full automation flow, escalation paths, and tools
+3. From the blueprint details, identify:
    - What the input/ticket type is (e.g. Linear ticket, GitHub issue, support request, etc.)
    - Which tool is needed to fetch those inputs (e.g. `list_issues`, `search_issues`, etc.)
-4. Select the correct blueprint based on what the user wants to automate, ask the user if ambiguous then use `get_blueprint_details` to fetch the full automation flow, escalation paths, and tools
-5. Quick tool validation: check the blueprint's required tools/apps against your available MCP tools. If any are missing, tell the user which tools they need to connect before proceeding. Do not continue until all required tools are available.
-6. Use the appropriate MCP tool to find the relevant tickets/inputs that match the blueprint's criteria
-7. Ask the user which tickets/inputs they want to process (all, a subset, or a specific one)
+4. Quick tool validation: check the blueprint's required tools/apps against your available MCP tools. If any are missing, tell the user which tools they need to connect before proceeding. Do not continue until all required tools are available.
+5. Use the appropriate MCP tool to find the relevant tickets/inputs that match the blueprint's criteria
+6. Ask the user which tickets/inputs they want to process (all, a subset, or a specific one)
 
 ## Phase 2: Execute each ticket sequentially
 
@@ -77,9 +76,11 @@ Wait for the user to confirm before proceeding to the next step.
 
 ### When stuck
 
-1. Use `get_sample_instances` to see how similar tickets were handled
-2. Re-read the blueprint step description and escalation paths for clues
-3. If still stuck, STOP and tell the user which step, what you tried, and what's missing
+1. Use `search_past_work` with `detail: "high_level"` to see how users handled similar work — this shows task-level patterns and decision context
+2. Use `search_past_work` with `detail: "browser_steps"` to see detailed step-by-step browser actions users took for similar entities
+3. Use `search_past_executions` to see how other agents handled similar tickets with this blueprint — learn from prior automated runs
+4. Re-read the blueprint step description and escalation paths for clues
+5. If still stuck, STOP and tell the user which step, what you tried, and what's missing
 
 ### Never skip and disclaim
 
@@ -95,4 +96,8 @@ After completing the run for each ticket, provide a summary:
 - **Total execution result**: Success / Partial (stopped at step N) / Failed
 
 ### Update execution log
-Always report the summary log using `upload_execution_log` tool with the required arguments. 
+Always report the summary log using `upload_execution_log` tool with:
+- `blueprintId` — the blueprint used
+- `ticketId` — the ticket/input ID
+- `content` — the summary text
+- `outcome` — one of: `"success"` (all steps completed), `"escalated"` (hit an escalation path and handed off), `"failed"` (encountered error or blocker), or `"unknown"` (outcome unclear)

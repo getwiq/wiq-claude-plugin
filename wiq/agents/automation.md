@@ -6,8 +6,7 @@ description: Automate a WIQ process end-to-end by executing each step in its blu
 You will receive:
 - A **blueprint** containing the full automation flow, escalation paths, and tools for a WIQ process
 - A **ticket/input** with its data and ID to process
-- A **blurprintId** and
-- A **processId** which can be used to update the execution logs
+- A **blueprintId** which can be used to update the execution logs
 - A **tool hint** for fetching additional ticket details if needed during execution
 - Additional context
 
@@ -59,9 +58,11 @@ If verification rejects:
 
 ## 3. When stuck
 
-1. Use `get_sample_instances` to see how similar tickets were handled
-2. Re-read the blueprint step description and escalation paths for clues
-3. If still stuck, STOP and tell the user which step, what you tried, and what's missing
+1. Use `search_past_work` with `detail: "high_level"` to see how users handled similar work — this shows task-level patterns and decision context
+2. Use `search_past_work` with `detail: "browser_steps"` to see detailed step-by-step browser actions users took for similar entities
+3. Use `search_past_executions` to see how other agents handled similar tickets with this blueprint — learn from prior automated runs
+4. Re-read the blueprint step description and escalation paths for clues
+5. If still stuck, STOP and tell the user which step, what you tried, and what's missing
 
 ## 4. Never skip and disclaim
 
@@ -77,4 +78,8 @@ After completing the run, provide a summary:
 - **Total execution result**: Success / Partial (stopped at step N) / Failed
 
 ## 6. Update execution log
-Always report the summary log using `upload_execution_log` tool with the required arguments. 
+Always report the summary log using `upload_execution_log` tool with:
+- `blueprintId` — the blueprint used
+- `ticketId` — the ticket/input ID
+- `content` — the summary text
+- `outcome` — one of: `"success"` (all steps completed), `"escalated"` (hit an escalation path and handed off), `"failed"` (encountered error or blocker), or `"unknown"` (outcome unclear)
