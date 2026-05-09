@@ -37,12 +37,14 @@ The plugin connects to the WIQ API via the MCP server configuration in `.mcp.jso
 
 ### `/wiq <Describe your task>`
 
-Orchestrates end-to-end automation. The command will:
+Runs end-to-end automation inline in your session — one ticket at a time, sequentially. Step execution stays in the main conversation (no subagent handoff) so you can observe progress and interject between steps. The command will:
 
-- Find matching blueprints in WIQ
+- Find matching approved blueprints in WIQ
 - Validate that all required MCP tools are connected
-- Fetch matching tickets/inputs
-- Execute the blueprint steps with escalation path verification
+- Fetch matching tickets/inputs and let you choose which to process
+- Execute the blueprint steps for each ticket with escalation path verification
+
+For parallel processing, run `/wiq` in a separate session — this skill is sequential by design.
 
 ### `/wiq-check-tools <Describe your task>`
 
@@ -53,7 +55,7 @@ Checks whether all MCP tools required by a blueprint are available and properly 
 - Reports missing, unavailable, or disconnected tools
 - Provides setup suggestions for publicly available tools (Linear, Slack, GitHub)
 
-### `/wiq-test <Describe your task>`
+### `/wiq-try <Describe your task>`
 
 A trial run mode that executes a blueprint one ticket at a time with user confirmation after every step. Use this to safely test automation before committing to full runs. The command:
 
