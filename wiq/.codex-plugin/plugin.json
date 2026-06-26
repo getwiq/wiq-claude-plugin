@@ -1,0 +1,36 @@
+{
+  "name": "wiq",
+  "version": "0.1.0",
+  "description": "Expose WIQ process data as MCP tools for Codex-powered workflow automation",
+  "author": {
+    "name": "WIQ",
+    "url": "https://getwiq.ai"
+  },
+  "homepage": "https://getwiq.ai",
+  "keywords": [
+    "processes",
+    "automation",
+    "mcp",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "WIQ",
+    "shortDescription": "Automate workflows from WIQ blueprints",
+    "longDescription": "Use WIQ process intelligence to find blueprints, validate required tools, execute workflow steps, and upload execution logs.",
+    "developerName": "WIQ",
+    "category": "Automation",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://getwiq.ai",
+    "defaultPrompt": [
+      "Use WIQ to automate this process",
+      "Check WIQ tool readiness",
+      "Run a WIQ blueprint trial"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "wiq",
+  "interface": {
+    "displayName": "WIQ"
+  },
+  "plugins": [
+    {
+      "name": "wiq",
+      "source": {
+        "source": "local",
+        "path": "./wiq"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Automation"
+    }
+  ]
+}

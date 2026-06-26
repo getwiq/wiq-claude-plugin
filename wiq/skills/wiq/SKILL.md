@@ -1,4 +1,5 @@
 ---
+name: wiq
 description: Automate a WIQ process end-to-end
 disable-model-invocation: false
 ---
@@ -76,7 +77,7 @@ If verification rejects:
 4. Re-read the blueprint step description and escalation paths for clues
 5. If still stuck, STOP and tell the user which step, what you tried, and what's missing
 
-For research-heavy lookups whose raw output would bloat this session, delegate the call to an `Explore` subagent and ask for a concise summary back. Step execution itself stays inline.
+For research-heavy lookups whose raw output would bloat this session, summarize the relevant findings before continuing. Step execution and research both stay inline.
 
 ### 4. Never skip and disclaim
 

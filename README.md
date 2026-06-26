@@ -1,6 +1,6 @@
-# WIQ Plugin for Claude
+# WIQ Plugin for Claude and Codex
 
-A Claude plugin that connects [WIQ](https://www.getwiq.ai/) process intelligence with Claude's agentic capabilities, enabling end-to-end workflow automation powered by real process data.
+A Claude and Codex plugin that connects [WIQ](https://www.getwiq.ai/) process intelligence with agentic coding assistants, enabling end-to-end workflow automation powered by real process data.
 
 ## What is WIQ?
 
@@ -8,7 +8,7 @@ WIQ is an AI-powered process intelligence platform that turns invisible processe
 
 ## What This Plugin Does
 
-This plugin exposes WIQ's data as MCP (Model Context Protocol) tools for Claude, allowing Claude to:
+This plugin exposes WIQ's data as MCP (Model Context Protocol) tools for Claude and Codex, allowing an agent to:
 
 - **Retrieve automation blueprints** that define step-by-step workflows with escalation paths and tool requirements
 - **Search past work** to see how users handled similar entities and tasks across applications
@@ -20,20 +20,39 @@ This plugin exposes WIQ's data as MCP (Model Context Protocol) tools for Claude,
 
 ### Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI or [Codex](https://developers.openai.com/codex) installed
 - Access to a WIQ workspace with configured blueprints
 
 ### Installation
 
-Clone this repository and install the plugin:
+Clone this repository and install the plugin for the host you use.
+
+For Claude:
 
 ```bash
 claude plugin add /path/to/wiq-claude-plugin
 ```
 
-The plugin connects to the WIQ API via the MCP server configuration in `.mcp.json`.
+For Codex, add this repository as a marketplace source, then install the `wiq` plugin from that marketplace:
+
+```bash
+codex plugin marketplace add /path/to/wiq-claude-plugin
+codex plugin add wiq@wiq
+```
+
+The plugin connects to the WIQ API via the shared MCP server configuration in `wiq/.mcp.json`. The WIQ MCP server handles OAuth discovery and registration, so the plugin does not commit a fixed OAuth client ID.
+
+### Plugin Layout
+
+- `wiq/.mcp.json` — shared MCP server config for Claude and Codex
+- `wiq/.claude-plugin/plugin.json` — Claude plugin manifest
+- `wiq/.codex-plugin/plugin.json` — Codex plugin manifest
+- `.claude-plugin/marketplace.json` — Claude marketplace metadata
+- `.agents/plugins/marketplace.json` — Codex marketplace metadata
 
 ## Commands
+
+Claude users can invoke these as slash commands. Codex users can invoke the WIQ plugin or the corresponding bundled skill by name.
 
 ### `/wiq <Describe your task>`
 

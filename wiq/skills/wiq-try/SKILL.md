@@ -1,4 +1,5 @@
 ---
+name: wiq-try
 description: Trial run of a WIQ blueprint — executes one ticket at a time with user confirmation after every step
 disable-model-invocation: false
 ---
