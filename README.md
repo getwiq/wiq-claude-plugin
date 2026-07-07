@@ -85,6 +85,15 @@ A trial run mode that executes a blueprint one ticket at a time with user confir
 - Stops immediately on failures or missing tools — no skipping or disclaimers
 - Provides a detailed summary of each ticket's execution result
 
+### `/wiq-blueprint-from-skill <skill name>`
+
+Reads the content of another named Claude/Codex skill and creates a WIQ blueprint from it. Use this to turn a skill you've authored into a reusable, refinable blueprint. The command:
+
+- Reads the named skill's content (including any bundled reference files)
+- Maps the skill's procedure into a blueprint: ordered steps, escalation paths, tools, and ticket-matching rules — grounded in what the skill actually says
+- Shows a preview and asks you to confirm before creating anything
+- Calls `create_blueprint` to create a private draft you own, then points you to `update_blueprint` and the WIQ app to refine and submit it for approval
+
 ## Key Design Principles
 
 - **Sequential execution** — Blueprint steps run in strict order with no skipping
