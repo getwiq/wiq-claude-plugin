@@ -15,7 +15,11 @@ Automate the WIQ process "$ARGUMENTS" end-to-end.
 3. From the blueprint details, identify:
    - What the input/ticket type is (e.g. Linear ticket, GitHub issue, support request, etc.)
    - Which tool is needed to fetch those inputs (e.g. `list_issues`, `search_issues`, etc.)
-4. Quick tool validation: check the blueprint's required tools/apps against your available MCP tools. If any are missing, tell the user which tools they need to connect before proceeding. Do not continue until all required tools are available.
+4. **Establish the execution path up front.** Check the blueprint's required tools/apps against the tools available in this session *now* (don't assume from past sessions). For each missing tool, walk this list **once, top to bottom, and stop at the first path that's available** — never re-offer a path you've already ruled out:
+   1. **MCP connector** — *if* the app appears in the connector registry, offer to connect it (most reliable). Not in the registry, or the user declines → go to 2.
+   2. **Browser extension** (Claude in Chrome) — if usable, use it. Otherwise → go to 3.
+   3. **Computer use / screen control** — last resort.
+   If none of the three applies, STOP and ask the user. Settle every required tool's path before executing any step, and never silently probe browser tabs or screen access.
 5. Use the appropriate MCP tool to find the relevant tickets/inputs that match the blueprint's criteria
 6. Ask the user which tickets/inputs they want to process (all, a subset, or a specific one). If the user wants parallel processing, tell them to run a separate session — this skill is sequential.
 
@@ -31,7 +35,7 @@ Read the entire blueprint first. Identify which steps have mapped tools, which i
 
 Each step is a **blocking dependency** for the next. Never skip, reorder, or parallelize steps.
 
-**a. Identify the required tool.** Use mapped tools from `toolActions`. If `toolActions` is empty, the step is NOT optional — find another available tool (browser automation, search, API calls) or STOP and ask the user. If the required tool/connector is not available, STOP immediately and ask the user. Do NOT skip the step, do NOT move to subsequent steps, and do NOT attempt workarounds like partial outputs for later steps. A missing tool means the entire execution is blocked at this step.
+**a. Identify the required tool.** Use mapped tools from `toolActions`. If `toolActions` is empty or the mapped tool is unavailable, walk these paths **once, top to bottom, and stop at the first that's available** — never re-offer a path you've ruled out: (1) **MCP connector**, only if the app is in the connector registry; (2) **browser extension**; (3) **computer use**. The moment a path is unavailable or declined, move to the next. If none applies, STOP and ask the user. Do NOT skip the step, do NOT move to subsequent steps, and do NOT attempt workarounds like partial outputs for later steps. A missing tool means the entire execution is blocked at this step.
 
 **b. Execute the action.** Apply it to the ticket/input with correct parameters from ticket data and prior step outputs. On failure, retry once — if it fails again, STOP and escalate.
 
