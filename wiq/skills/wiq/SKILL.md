@@ -11,7 +11,7 @@ Automate the WIQ process "$ARGUMENTS" end-to-end.
 ## Phase 1: Discovery and setup
 
 1. Use the `list_blueprints` MCP tool to find approved blueprints matching "$ARGUMENTS" and their ticket matching rules
-2. Select the correct blueprint based on what the user wants to automate, ask the user if ambiguous, then use `get_blueprint_details` once to fetch the full automation flow, escalation paths, and tools. Reference this fetched detail throughout — do not re-fetch per ticket.
+2. Select the correct blueprint based on what the user wants to automate, ask the user if ambiguous, then use `get_blueprint_details` once to fetch the full automation flow, escalation paths, and tools. If the response includes a `customization` field, it contains YOUR user's personal instructions for this blueprint (e.g. which segment or customers they handle) — apply them to every run. Reference this fetched detail throughout — do not re-fetch per ticket.
 3. From the blueprint details, identify:
    - What the input/ticket type is (e.g. Linear ticket, GitHub issue, support request, etc.)
    - Which tool is needed to fetch those inputs (e.g. `list_issues`, `search_issues`, etc.)
