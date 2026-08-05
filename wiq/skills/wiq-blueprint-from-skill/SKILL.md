@@ -41,9 +41,9 @@ Read the whole skill first, then translate it into the `create_blueprint` argume
     - `"unknown"` — only when you genuinely can't tell whether it's satisfiable.
   - Do not invent tools the skill doesn't reference, and do not drop a capability the skill needs just because it's `"unavailable"` — record it as `"unavailable"` so the gap is visible.
 - **ticketMatching** — if the skill implies what it runs on (a Linear ticket, a support email, an invoice, etc.), set `categories` (short labels) and `primaryEntityType` (the canonical entity, e.g. `"ticket"`, `"invoice"`), and a `condition` string if the skill only applies under specific circumstances. If the skill doesn't imply an input type, pass `{ "categories": [] }`.
-- **optimizedFor** — set it to the harness you are running in: `"claude"` if you are Claude (Claude Code / Claude), or `"openai-codex"` if you are Codex. The skill is authored and tool-checked against your session, so this records the agent platform the blueprint was built for.
 
 Guidelines:
+- Do not pass a platform. The WIQ MCP server is connected with your harness's platform already pinned, so `create_blueprint` takes no `optimizedFor` argument — the blueprint records the platform you are running on for you.
 - Keep steps faithful and self-contained: someone reading only the blueprint should be able to follow the skill's procedure.
 - Don't collapse distinct actions into one step, and don't split a single action into many. One meaningful action per step.
 - If the skill is thin or ambiguous on a point, say so rather than inventing detail — ask the user or leave the step description honest about the gap.

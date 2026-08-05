@@ -14,7 +14,7 @@
     "workflow"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
+  "mcpServers": "./.mcp.codex.json",
   "interface": {
     "displayName": "WIQ",
     "shortDescription": "Automate workflows from WIQ blueprints",

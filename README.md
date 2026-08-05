@@ -40,11 +40,14 @@ codex plugin marketplace add /path/to/wiq-claude-plugin
 codex plugin add wiq@wiq
 ```
 
-The plugin connects to the WIQ API via the shared MCP server configuration in `wiq/.mcp.json`. The WIQ MCP server handles OAuth discovery and registration, so the plugin does not commit a fixed OAuth client ID.
+The plugin connects to the WIQ API via an MCP server configuration per harness. The WIQ MCP server handles OAuth discovery and registration, so the plugin does not commit a fixed OAuth client ID.
+
+Each config pins its harness in the endpoint URL — `?platform=claude` for Claude, `?platform=openai-codex` for Codex. WIQ reads that to serve the blueprint version optimized for your runtime and to attribute execution logs, so no skill ever has to name a platform. The two configs are separate files because the value differs: Claude auto-discovers `.mcp.json` at the plugin root, while the Codex manifest points at its own file explicitly.
 
 ### Plugin Layout
 
-- `wiq/.mcp.json` — shared MCP server config for Claude and Codex
+- `wiq/.mcp.json` — MCP server config for Claude (`?platform=claude`)
+- `wiq/.mcp.codex.json` — MCP server config for Codex (`?platform=openai-codex`)
 - `wiq/.claude-plugin/plugin.json` — Claude plugin manifest
 - `wiq/.codex-plugin/plugin.json` — Codex plugin manifest
 - `.claude-plugin/marketplace.json` — Claude marketplace metadata

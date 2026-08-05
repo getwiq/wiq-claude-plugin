@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `/wiq-blueprint-from-skill <skill name>` — read the content of another named skill and create a WIQ blueprint from it (via the `create_blueprint` MCP tool), grounding the blueprint's steps, escalation paths, tools, and ticket-matching rules in the skill's content
 
+### Changed
+
+- Each harness's MCP config now pins its platform in the endpoint URL: `?platform=claude` in `wiq/.mcp.json`, `?platform=openai-codex` in the new `wiq/.mcp.codex.json` (referenced by the Codex manifest). WIQ serves the blueprint version optimized for the connected runtime and attributes execution logs from the URL, so the platform is no longer a tool argument the agent supplies — `/wiq-blueprint-from-skill` no longer sets `optimizedFor`.
+
 ## [0.1.0] - 2026-03-23
 
 ### Added

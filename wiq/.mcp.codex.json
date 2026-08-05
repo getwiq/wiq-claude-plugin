@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "WIQ": {
+      "url": "https://mcp.prod.getwiq.ai/mcp?platform=openai-codex"
+    }
+  }
+}
