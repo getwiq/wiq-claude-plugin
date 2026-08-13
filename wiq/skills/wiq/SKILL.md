@@ -10,18 +10,46 @@ Automate the WIQ process "$ARGUMENTS" end-to-end.
 
 ## Phase 1: Discovery and setup
 
-1. Use the `list_blueprints` MCP tool to find approved blueprints matching "$ARGUMENTS" and their ticket matching rules
+1. Use the `list_blueprints` MCP tool to find approved blueprints matching "$ARGUMENTS". Each row carries its Starting Point `triggers[]` (`title`, `source`, `onlyUse`, `exclude`, `runOnceForEach`) — that's what tells two similar-sounding blueprints apart, so use it to choose. Rows have no `toolActions` or `content`; those are platform-specific and come from `get_blueprint_details` in the next step.
 2. Select the correct blueprint based on what the user wants to automate, ask the user if ambiguous, then use `get_blueprint_details` once to fetch the full automation flow, escalation paths, and tools. If the response includes a `customization` field, it contains YOUR user's personal instructions for this blueprint (e.g. which segment or customers they handle) — apply them to every run. Reference this fetched detail throughout — do not re-fetch per ticket.
-3. From the blueprint details, identify:
-   - What the input/ticket type is (e.g. Linear ticket, GitHub issue, support request, etc.)
-   - Which tool is needed to fetch those inputs (e.g. `list_issues`, `search_issues`, etc.)
+3. **Read `flow.start` — the Starting Point.** This is the blueprint's authoritative definition of what starts a run and how to find pending work. It is NOT a step, never appears in `flow.steps`, and is excluded from the `1..N` step numbering. Each entry in `flow.start.triggers[]` gives you:
+   - `title` — the trigger's name; use it to label this channel's candidates
+   - `source` — the inbound channel and object in human terms (always present)
+   - `runOnceForEach` — the unit of ONE execution, i.e. what you iterate over (always present)
+   - `onlyUse` — the qualifying condition: an item must match this to be in scope
+   - `exclude` — the disqualifying condition: refuse an item matching this, even if it also matches `onlyUse` (exclude wins)
+   - `toolActions` — the `Tool.method` entries that list this trigger's pending work, resolving against the blueprint's `tools[]`. Usually one, but a channel can need several calls (e.g. one to page a list, another to read each record) — run all of them for that trigger. May be empty, in which case fall back to the tool paths in step 4.
+   - `content` — optional prose blocks recording how this trigger behaves on THIS platform: polling cadence, a filter the connector can't express, a field the API omits. Read it before calling `toolActions`; it's usually where the reason your call returns something unexpected is written down.
+
+   `flow.start.toolActions` lists the trigger-source apps across the whole Starting Point, and `flow.start.isAutomatable` says whether finding the work can be done unattended.
+
+   Do not infer the input type from the description or step 1 when `flow.start` is present — it is more specific and authoritative. `flow.start` is absent on a blueprint that has no Starting Point yet; only then fall back to inferring from the description and step 1.
 4. **Establish the execution path up front.** Check the blueprint's required tools/apps against the tools available in this session *now* (don't assume from past sessions). For each missing tool, walk this list **once, top to bottom, and stop at the first path that's available** — never re-offer a path you've already ruled out:
    1. **MCP connector** — *if* the app appears in the connector registry, offer to connect it (most reliable). Not in the registry, or the user declines → go to 2.
    2. **Browser extension** (Claude in Chrome) — if usable, use it. Otherwise → go to 3.
    3. **Computer use / screen control** — last resort.
    If none of the three applies, STOP and ask the user. Settle every required tool's path before executing any step, and never silently probe browser tabs or screen access.
-5. Use the appropriate MCP tool to find the relevant tickets/inputs that match the blueprint's criteria
-6. Ask the user which tickets/inputs they want to process (all, a subset, or a specific one). If the user wants parallel processing, tell them to run a separate session — this skill is sequential.
+5. **Run EVERY trigger and pool the candidates.** `flow.start.triggers[]` may hold several triggers; each is a separate inbound channel, and work can arrive on any of them. Do not pick one, and do not stop after the first that returns results:
+
+   a. For each trigger, call every entry in its `toolActions` to list pending work, honoring anything its `content` says about how that channel behaves.
+   b. Filter each trigger's results by its OWN `onlyUse` / `exclude` — the conditions are per-trigger, not shared.
+   c. **Apply `customization` as a further narrowing.** When `customization` is present, apply it on top of each trigger's `onlyUse` / `exclude` — never as a replacement. The blueprint's conditions define what the process handles; the user's instructions narrow that to what THEY handle (e.g. "only EMEA dairy customers"). Keep both counts per trigger — the candidates that survived `onlyUse` / `exclude`, and the subset that also survived `customization` — so you can report the difference in the listing below.
+   d. Present the surviving candidates to the user **grouped by trigger**, labelled with each trigger's `title`, so they can see where each item came from:
+
+      ```
+      Support Inbox Emails (3 candidates)
+        1. "Refund request — order #8821"     — 2h ago
+        2. ...
+      Zendesk Tickets (1 candidate, 4 hidden by your customization)
+        4. "Cancel my subscription"           — 20m ago
+      ```
+
+      Number the items continuously across groups so the user can select by number. Where `customization` excluded items, say so next to that trigger's count, so the user understands why a channel shows fewer candidates than expected.
+   e. If a trigger's `toolActions` fail or its tools are unavailable, say so explicitly next to that trigger's group and continue with the others — a partial pool is usable, but the user must know a channel is missing rather than silently seeing fewer options.
+   f. If a trigger returns nothing, show it with "(no pending work)". An empty channel is information, not something to hide.
+   g. If the same underlying item appears under two triggers, show it once and note both trigger names.
+
+6. Ask the user which candidates to process (all, a subset, or one). Each selected item is one run, iterating per the trigger's `runOnceForEach`. If the user wants parallel processing, tell them to run a separate session — this skill is sequential.
 
 ## Phase 2: Execute each ticket inline
 
@@ -30,6 +58,8 @@ For each selected ticket/input, execute the blueprint **directly in this session
 ### 1. Understand the blueprint before starting
 
 Read the entire blueprint first. Identify which steps have mapped tools, which involve irreversible actions, and what the expected inputs/outputs are at each step. Understand all escalation paths — these are **global** conditions that apply throughout the entire execution, not tied to any single step (see step 2d).
+
+**Two different things are called "triggers".** `flow.start.triggers[]` are *entry* conditions — evaluated ONCE, before step 1, to find work. `escalationPaths[].trigger` are *exception* conditions — evaluated after EVERY step. Never re-evaluate a Starting Point trigger mid-run, and never treat an escalation trigger as a source of work.
 
 ### 2. Execute each node in strict sequential order
 

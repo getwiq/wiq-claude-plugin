@@ -40,19 +40,26 @@ Read the whole skill first, then translate it into the `create_blueprint` argume
     - `"unavailable"` — the skill needs this capability but no connected tool or command provides it (missing, not connected, or unauthenticated).
     - `"unknown"` — only when you genuinely can't tell whether it's satisfiable.
   - Do not invent tools the skill doesn't reference, and do not drop a capability the skill needs just because it's `"unavailable"` — record it as `"unavailable"` so the gap is visible.
-- **ticketMatching** — if the skill implies what it runs on (a Linear ticket, a support email, an invoice, etc.), set `categories` (short labels) and `primaryEntityType` (the canonical entity, e.g. `"ticket"`, `"invoice"`), and a `condition` string if the skill only applies under specific circumstances. If the skill doesn't imply an input type, pass `{ "categories": [] }`.
+- **flow.start** — the Starting Point: how a run is triggered. It is a sibling of `flow.steps`, never a step numbered 0, and is excluded from the `1..N` numbering. The decoder accepts a `flow` without it, but emit one — a blueprint with no Starting Point cannot be executed, since `/wiq` and `/wiq-test` read it to find pending work. Derive it from what the skill implies about where work arrives. **One channel per trigger:** if the skill reads "handle emails **or** Slack messages", that is TWO triggers, not one with "or" in the `source`. Each trigger takes:
+  - `title` — REQUIRED. A short name for the channel ("Support Inbox Emails").
+  - `source` — REQUIRED. The channel + object ("Emails in the support@acme.com inbox"). A blank value is rejected.
+  - `runOnceForEach` — REQUIRED. What ONE iteration operates on, the record the steps drive to a terminal state ("Email thread"). Without it an executor can't tell one case from the whole queue.
+  - `onlyUse` / `exclude` — the qualifying and disqualifying conditions, when the skill implies them. `exclude` is how a sibling process's work gets refused, so set it whenever the skill says what it does NOT handle.
+  - `toolActions` — the `Tool.method` entries that list pending work (`["Gmail.readInbox"]`). Each MUST name a tool and method present in the `tools` array — a bare app name is rejected. Usually one; use several when a channel genuinely needs multiple calls.
+  - `content` — optional content blocks (same shape as a step's), for platform quirks of using those `toolActions`: polling cadence, a filter the tool can't express, a field the API omits. Leave it off unless the skill says something that fits.
+
+  Also set `isAutomatable` (can finding the work be done unattended) and `flow.start.toolActions` (the trigger-source `Tool.method` list across all triggers).
 
 Guidelines:
-- Do not pass a platform. The WIQ MCP server is connected with your harness's platform already pinned, so `create_blueprint` takes no `optimizedFor` argument — the blueprint records the platform you are running on for you.
 - Keep steps faithful and self-contained: someone reading only the blueprint should be able to follow the skill's procedure.
 - Don't collapse distinct actions into one step, and don't split a single action into many. One meaningful action per step.
 - If the skill is thin or ambiguous on a point, say so rather than inventing detail — ask the user or leave the step description honest about the gap.
 
 ## Phase 3: Confirm, then create
 
-1. Present a concise preview of the mapped blueprint: name, description, the numbered step titles (with which are non-automatable / have HITL checkpoints), the tools with their availability (`available` / `unavailable` / `unknown` from the cross-check above), and the ticketMatching. Call out any `unavailable` tools as gaps the user will need to connect before the blueprint can run, and note anything you couldn't determine from the skill.
+1. Present a concise preview of the mapped blueprint: name, description, the Starting Point triggers (each trigger's `title`, `source`, `runOnceForEach` and `toolActions`, plus any `onlyUse` / `exclude`), the numbered step titles (with which are non-automatable / have HITL checkpoints), and the tools with their availability (`available` / `unavailable` / `unknown` from the cross-check above). Call out any `unavailable` tools as gaps the user will need to connect before the blueprint can run, and note anything you couldn't determine from the skill.
 2. Ask the user to confirm or adjust. Apply any requested changes.
-3. Call the `create_blueprint` MCP tool with the mapped arguments (`name`, `description`, `flow`, and `tools` / `ticketMatching` when non-empty).
+3. Call the `create_blueprint` MCP tool with the mapped arguments: `name`, `description`, `flow` (with `start`, `steps` and `escalationPaths`), `tools` when non-empty, and `optimizedFor`.
 4. Report the result:
    - The returned `blueprintId`.
    - That it was created as a **private draft** owned by the caller.
